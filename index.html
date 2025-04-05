@@ -74,6 +74,8 @@
       display: none;
       flex-direction: column;
       box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+      resize: both;
+      overflow: hidden;
     }
     .title-bar {
       background: #000080;
@@ -152,24 +154,26 @@
       cursor: pointer;
       border: none;
     }
+    /* GIF Glitcher */
+    #glitcher-overlay {
+      display: none; /* Cacher par défaut */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 9999; /* S'assurer que le GIF se place au-dessus */
+    }
+
+    #glitcher-overlay img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Le GIF prendra toute la page */
+    }
   </style>
 </head>
-
 <body>
-
-  <!-- BSOD -->
-  <div id="bsod">
-    <h1>:(</h1>
-    <p>Votre PC a rencontré un problème et doit redémarrer.</p>
-    <p>Erreur : FUCK_THE_VIRUS</p>
-  </div>
-
-  <!-- Fenêtre d'erreur après redémarrage -->
-  <div id="error-screen">
-    <p>system.sys not found, system booting impossible</p>
-    <button class="reinstall-btn" onclick="reinstallSystem()">Réinstaller</button>
-    <button class="close-btn" onclick="resetSystem()">X</button>
-  </div>
 
   <!-- Icônes Bureau -->
   <div class="desktop-icon" onclick="openWindow('computer')">
@@ -192,6 +196,16 @@
     <div>non un virus.exe</div>
   </div>
 
+  <div class="desktop-icon" onclick="triggerGlitcher()">
+    <img src="glitcher-icon.png" alt="Glitcher">
+    <div>Glitcher</div>
+  </div>
+
+  <!-- Glitcher Overlay (GIF qui prend toute la page) -->
+  <div id="glitcher-overlay">
+    <img src="glitch.gif" alt="Glitch animation">
+  </div>
+
   <!-- Taskbar -->
   <div class="taskbar" id="taskbar">
     <div class="start-button" onclick="toggleStartMenu()">Démarrer</div>
@@ -206,7 +220,6 @@
   </div>
 
   <!-- Fenêtres -->
-
   <!-- Ordinateur -->
   <div class="window" id="window-computer">
     <div class="title-bar">
@@ -237,8 +250,86 @@
     <canvas id="paintCanvas"></canvas>
   </div>
 
+  <!-- BSOD -->
+  <div id="bsod">
+    <h1>:(</h1>
+    <p>Votre PC a rencontré un problème et doit redémarrer.</p>
+    <p>Erreur : SYSTEM_ERROR</p>
+  </div>
+
+  <!-- Fenêtre d'erreur après redémarrage -->
+  <div id="error-screen">
+    <p>system.sys not found, system booting impossible</p>
+    <button class="reinstall-btn" onclick="reinstallSystem()">Réinstaller</button>
+    <button class="close-btn" onclick="resetSystem()">X</button>
+  </div>
+
   <!-- JavaScript -->
   <script>
+    // Fonction Paint
+    const paintCanvas = document.getElementById("paintCanvas");
+    const ctx = paintCanvas.getContext("2d");
+    let painting = false;
+
+    paintCanvas.width = 600;
+    paintCanvas.height = 400;
+
+    function startPosition(e) {
+      painting = true;
+      draw(e);
+    }
+
+    function endPosition() {
+      painting = false;
+      ctx.beginPath();
+    }
+
+    function draw(e) {
+      if (!painting) return;
+
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "black";
+
+      ctx.lineTo(e.clientX - paintCanvas.offsetLeft, e.clientY - paintCanvas.offsetTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - paintCanvas.offsetLeft, e.clientY - paintCanvas.offsetTop);
+    }
+
+    paintCanvas.addEventListener("mousedown", startPosition);
+    paintCanvas.addEventListener("mouseup", endPosition);
+    paintCanvas.addEventListener("mousemove", draw);
+
+    // Cette fonction est appelée lorsque l'icône Glitcher est cliquée
+    function triggerGlitcher() {
+      // Masquer le contenu de la page (icônes et barre de tâche)
+      hideDesktopIconsAndTaskbar();
+
+      // Afficher le GIF Glitcher
+      document.getElementById('glitcher-overlay').style.display = 'block';
+    }
+
+    function hideDesktopIconsAndTaskbar() {
+      const icons = document.querySelectorAll('.desktop-icon');
+      const taskbar = document.getElementById('taskbar');
+      icons.forEach(icon => icon.style.display = 'none');
+      taskbar.style.display = 'none';
+    }
+
+    // Masquer le glitcher et réafficher les éléments cachés quand le GIF est cliqué
+    document.getElementById('glitcher-overlay').addEventListener('click', function() {
+      // Masquer l'overlay glitch
+      document.getElementById('glitcher-overlay').style.display = 'none';
+
+      // Réafficher les icônes et la barre de tâche
+      const icons = document.querySelectorAll('.desktop-icon');
+      const taskbar = document.getElementById('taskbar');
+      icons.forEach(icon => icon.style.display = 'inline-block');
+      taskbar.style.display = 'flex';
+    });
+
+    // Fonction de bascule du menu Démarrer
     function toggleStartMenu() {
       const menu = document.getElementById('startMenu');
       menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
@@ -246,7 +337,6 @@
 
     function openWindow(name) {
       document.getElementById('window-' + name).style.display = 'flex';
-      document.getElementById('startMenu').style.display = 'none';
     }
 
     function closeWindow(name) {
@@ -261,55 +351,6 @@
       }, 3000); // Simule un "redémarrage" après 3 sec
     }
 
-    // Masquer les icônes et la barre de tâche
-    function hideDesktopIconsAndTaskbar() {
-      const icons = document.querySelectorAll('.desktop-icon');
-      const taskbar = document.getElementById('taskbar');
-      icons.forEach(icon => icon.style.display = 'none');
-      taskbar.style.display = 'none';
-    }
-
-    // Afficher les icônes et la barre de tâche
-    function showDesktopIconsAndTaskbar() {
-      const icons = document.querySelectorAll('.desktop-icon');
-      const taskbar = document.getElementById('taskbar');
-      icons.forEach(icon => icon.style.display = 'inline-block');
-      taskbar.style.display = 'flex';
-    }
-
-    // Gestion de Paint
-    const canvas = document.getElementById('paintCanvas');
-    const ctx = canvas.getContext('2d');
-    let painting = false;
-
-    function startPosition(e) {
-      painting = true;
-      draw(e);
-    }
-    function endPosition() {
-      painting = false;
-      ctx.beginPath();
-    }
-    function draw(e) {
-      if (!painting) return;
-      ctx.lineWidth = 5;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "black";
-      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-    }
-
-    if (canvas) {
-      canvas.width = 600;
-      canvas.height = 350;
-      canvas.addEventListener('mousedown', startPosition);
-      canvas.addEventListener('mouseup', endPosition);
-      canvas.addEventListener('mousemove', draw);
-    }
-
-    // Gestion de l'erreur au "redémarrage"
     window.onload = function() {
       if (localStorage.getItem('crashed') === 'yes') {
         document.body.style.background = 'url(wallpaper.jpg) no-repeat center center fixed'; // Garder le fond
@@ -330,7 +371,7 @@
       localStorage.removeItem('crashed');
       location.reload(); // Redémarre pour réinitialiser
     }
-
+          
     // Fonction pour basculer en plein écran
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
