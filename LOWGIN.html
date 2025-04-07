@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Mot de Passe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .form-container h2 {
+            text-align: center;
+        }
+        .input-container {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button-container {
+            text-align: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Entrez votre mot de passe</h2>
+        <form id="passwordForm">
+            <div class="input-container">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+            </div>
+            <div class="button-container">
+                <button type="submit">Soumettre</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Exemple de mot de passe "crypté" ou codé dans le code
+        const encryptedPassword = "U0VDUkVUS0VZSVNDT09M";
+
+        // Décryptage (si nécessaire) pour l'usage côté client
+        function decryptPassword(encrypted) {
+            let decoded = atob(encrypted); // Décode en Base64
+            return decoded;
+        }
+
+        // Exemple d'usage dans le formulaire
+        document.getElementById("passwordForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const enteredPassword = document.getElementById("password").value;
+            const decryptedPassword = decryptPassword(encryptedPassword);
+            
+            if (enteredPassword === decryptedPassword) {
+                alert("Mot de passe correct !");
+                window.location.href = "SECRETKEYSPACE.html";
+            } else {
+                alert("Mot de passe incorrect !");
+            }
+        });
+    </script>
+</body>
+</html>
